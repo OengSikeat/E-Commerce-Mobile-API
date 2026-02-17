@@ -1,12 +1,18 @@
 package org.example.basiclogin.controller;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.basiclogin.jwt.JwtService;
 import org.example.basiclogin.model.Request.AppUserRequest;
 import org.example.basiclogin.model.Request.AuthRequest;
 import org.example.basiclogin.model.Response.AuthResponse;
+import org.example.basiclogin.model.Response.AppUserResponse;
 import org.example.basiclogin.service.AppUserService;
 import org.example.basiclogin.service.BlacklistTokenService;
+import org.example.basiclogin.utils.ApiResponse;
+import org.example.basiclogin.utils.BaseResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/auths")
 @RequiredArgsConstructor
-public class AuthController {
+@SecurityRequirement(name = "bearerAuth")
+public class AuthController extends BaseResponse {
     private final AppUserService appUserService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -39,21 +46,22 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticate(@RequestBody AuthRequest request) throws Exception {
+    public ResponseEntity<ApiResponse<AuthResponse>> authenticate(@RequestBody AuthRequest request) throws Exception {
         authenticate(request.getEmail(), request.getPassword());
         final UserDetails userDetails = appUserService.loadUserByUsername(request.getEmail());
         final String token = jwtService.generateToken(userDetails);
         AuthResponse authResponse = new AuthResponse(token);
-        return ResponseEntity.ok(authResponse);
+        return responseEntity(true, "Login successful", HttpStatus.OK, authResponse);
+    }
+    @PreAuthorize("hasRole('SUPER-ADMIN')")
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<AppUserResponse>> register(@Valid @RequestBody AppUserRequest request){
+        return responseEntity(true, "User registered", HttpStatus.CREATED, appUserService.register(request));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody AppUserRequest request){
-        return ResponseEntity.ok(appUserService.register(request));
-    }
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasAllRoles('SUPER-ADMIN','ADMIN','MANAGER','USER')")
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
 
         String authHeader = request.getHeader("Authorization");
 
@@ -62,7 +70,7 @@ public class AuthController {
             blacklistTokenService.blacklistToken(token);
         }
 
-        return ResponseEntity.ok("Logged out successfully");
+        return responseEntity(true, "Logged out successfully", HttpStatus.OK);
     }
-
+    //clue sth has to be related ith preauthority
 }

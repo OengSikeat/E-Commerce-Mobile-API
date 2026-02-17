@@ -1,10 +1,9 @@
-package org.example.basiclogin.model;
+package org.example.basiclogin.model.Entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.basiclogin.config.SecurityConfig;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,12 +21,13 @@ public class AppUser implements UserDetails {
     private String fullName;
     private String email;
     private String password;
-    private List<String> roles;
+    private String role;
+    private Long createdBy;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        for(String role : roles){
+        if (role != null && !role.isBlank()) {
             authorities.add(new SimpleGrantedAuthority(role));
         }
         return authorities;

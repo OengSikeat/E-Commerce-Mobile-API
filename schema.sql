@@ -22,4 +22,6 @@ CREATE TABLE blacklisted_tokens(
     token_id serial PRIMARY KEY NOT NULL,
     token VARCHAR(500) NOT NULL,
     expiry_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null
-)
+);
+ALTER TABLE app_users
+    ADD COLUMN created_by INT REFERENCES app_users(user_id);

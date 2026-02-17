@@ -1,10 +1,9 @@
-package org.example.basiclogin.model;
+package org.example.basiclogin.model.Entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 

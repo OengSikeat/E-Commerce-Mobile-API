@@ -35,12 +35,13 @@ public class JwtService {
 
         Map<String, Object> claims = new HashMap<>();
 
-        claims.put("roles",
-                userDetails.getAuthorities()
-                        .stream()
-                        .map(auth -> auth.getAuthority())
-                        .toList()
-        );
+        // store single role as a claim
+        String role = userDetails.getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .findFirst()
+                .orElse(null);
+
+        claims.put("role", role);
 
         return createToken(claims, userDetails.getUsername());
     }
@@ -71,8 +72,8 @@ public class JwtService {
     public Date extractExpirationDate(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
-    public List<String> extractRoles(String token) {
-        return extractClaim(token, claims -> claims.get("roles", List.class));
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
 
