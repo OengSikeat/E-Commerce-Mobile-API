@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: BasicLogin
+  datasource:
+    url: jdbc:postgresql://localhost:5432/basic_login
+    username: postgres
+    password: keat6951
+server:
+  port: 9000
