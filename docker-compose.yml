@@ -1,0 +1,54 @@
+services:
+  e_commerce-db:
+    image: postgres
+    container_name: e_commerce_db_container
+    restart: unless-stopped
+    volumes:
+      - e_commerce_db_data:/var/lib/postgresql
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: keat6951
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  e_commerce-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: e_commerce_api_container
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://e_commerce-db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: keat6951
+    depends_on:
+      e_commerce-db:
+        condition: service_healthy
+  storage:
+    image: minio/minio:latest
+    command: minio server /var/lib/minio/data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=Password123!
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - storage:/var/lib/minio/data
+
+volumes:
+  storage:
+  e_commerce_db_data:
+
+
+
+

@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/auths")
 @RequiredArgsConstructor
-@SecurityRequirement(name = "bearerAuth")
 public class AuthController extends BaseResponse {
     private final AppUserService appUserService;
     private final AuthenticationManager authenticationManager;

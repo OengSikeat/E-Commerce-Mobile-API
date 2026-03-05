@@ -5,5 +5,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/e_commerce_db
     username: postgres
     password: keat6951
+minio:
+  url: http://localhost:9000
+  access-key: admin
+  secret-key: Password123!
+  bucket-name: e-commerce-bucket
 server:
-  port: 9000
+  port: 9090
