@@ -1,27 +1,40 @@
-CREATE TABLE app_users
-(
-    user_id        serial PRIMARY KEY NOT NULL,
-    full_name VARCHAR(50)        NOT NULL,
-    email     VARCHAR(50)        NOT NULL,
-    password  VARCHAR(255)       NOT NULL
+CREATE TABLE users (
+                       id SERIAL PRIMARY KEY,
+                       email VARCHAR(255) NOT NULL UNIQUE,
+                       password VARCHAR(255) NOT NULL,
+                       full_name VARCHAR(255) NOT NULL,
+                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE app_roles
-(
-    role_id        serial PRIMARY KEY NOT NULL,
-    name VARCHAR(50)        NOT NULL
+CREATE TABLE products (
+                          id SERIAL PRIMARY KEY,
+                          name VARCHAR(255) NOT NULL,
+                          description TEXT,
+                          price DECIMAL(10,2) NOT NULL,
+                          image_url VARCHAR(500),
+                          size_options VARCHAR(255),
+                          on_promotion BOOLEAN DEFAULT FALSE
 );
 
-CREATE TABLE app_user_role
-(
-    user_id INT NOT NULL REFERENCES app_users (user_id) ON DELETE CASCADE,
-    role_id INT NOT NULL REFERENCES app_roles (role_id) ON DELETE CASCADE,
-    PRIMARY KEY (user_id, role_id)
+CREATE TABLE orders (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        product_id INTEGER NOT NULL,
+                        quantity INTEGER DEFAULT 1,
+                        total_amount DECIMAL(10,2) NOT NULL,
+                        status VARCHAR(20) DEFAULT 'pending',
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                        CONSTRAINT fk_orders_user
+                            FOREIGN KEY (user_id)
+                                REFERENCES users(id)
+                                ON DELETE CASCADE,
+
+                        CONSTRAINT fk_orders_product
+                            FOREIGN KEY (product_id)
+                                REFERENCES products(id)
+                                ON DELETE CASCADE,
+
+                        CONSTRAINT chk_order_status
+                            CHECK (status IN ('pending', 'shipped', 'delivered'))
 );
-CREATE TABLE blacklisted_tokens(
-    token_id serial PRIMARY KEY NOT NULL,
-    token VARCHAR(500) NOT NULL,
-    expiry_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null
-);
-ALTER TABLE app_users
-    ADD COLUMN created_by INT REFERENCES app_users(user_id);

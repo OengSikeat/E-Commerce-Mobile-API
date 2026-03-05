@@ -2,7 +2,7 @@ spring:
   application:
     name: BasicLogin
   datasource:
-    url: jdbc:postgresql://localhost:5432/basic_login
+    url: jdbc:postgresql://localhost:5432/e_commerce_db
     username: postgres
     password: keat6951
 server:

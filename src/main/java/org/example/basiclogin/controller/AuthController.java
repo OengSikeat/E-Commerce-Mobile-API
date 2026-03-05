@@ -1,6 +1,5 @@
 package org.example.basiclogin.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.basiclogin.jwt.JwtService;
@@ -9,12 +8,10 @@ import org.example.basiclogin.model.Request.AuthRequest;
 import org.example.basiclogin.model.Response.AuthResponse;
 import org.example.basiclogin.model.Response.AppUserResponse;
 import org.example.basiclogin.service.AppUserService;
-import org.example.basiclogin.service.BlacklistTokenService;
 import org.example.basiclogin.utils.ApiResponse;
 import org.example.basiclogin.utils.BaseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -33,7 +30,6 @@ public class AuthController extends BaseResponse {
     private final AppUserService appUserService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-    private final BlacklistTokenService blacklistTokenService;
 
     private void authenticate(String email, String password) throws Exception {
         try {
@@ -53,24 +49,11 @@ public class AuthController extends BaseResponse {
         AuthResponse authResponse = new AuthResponse(token);
         return responseEntity(true, "Login successful", HttpStatus.OK, authResponse);
     }
-    @PreAuthorize("hasRole('SUPER-ADMIN')")
+
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<AppUserResponse>> register(@Valid @RequestBody AppUserRequest request){
         return responseEntity(true, "User registered", HttpStatus.CREATED, appUserService.register(request));
     }
 
-    @PreAuthorize("hasAllRoles('SUPER-ADMIN','ADMIN','MANAGER','USER')")
-    @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
 
-        String authHeader = request.getHeader("Authorization");
-
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            blacklistTokenService.blacklistToken(token);
-        }
-
-        return responseEntity(true, "Logged out successfully", HttpStatus.OK);
-    }
-    //clue sth has to be related ith preauthority
 }

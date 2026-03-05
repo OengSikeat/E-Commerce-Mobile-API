@@ -10,103 +10,84 @@ import java.util.List;
 public interface AppUserRepository {
 
     @Results(id = "appUserLiteMapper", value = {
-            @Result(property = "userId", column = "user_id"),
-            @Result(property = "fullName", column = "full_name"),
+            @Result(property = "id", column = "id"),
             @Result(property = "email", column = "email"),
-            @Result(property = "role", column = "user_id", one = @One(
-                    select = "getRoleByUserId"
-            ))
+            @Result(property = "fullName", column = "full_name"),
+            @Result(property = "password", column = "password"),
+            @Result(property = "createdAt", column = "created_at")
     })
     @Select("""
-                SELECT * FROM app_users
-                WHERE user_id = #{userId}
+                SELECT id, email, full_name, password, created_at FROM users
+                WHERE id = #{id}
             """)
-    AppUser getUserByIdLite(Long userId);
+    AppUser getUserByIdLite(Long id);
 
     @Results(id = "appUserMapper", value = {
-            @Result(property = "userId", column = "user_id"),
-            @Result(property = "fullName", column = "full_name"),
+            @Result(property = "id", column = "id"),
             @Result(property = "email", column = "email"),
-            @Result(property = "role", column = "user_id", one = @One(
-                    select = "getRoleByUserId"
-            )),
-            @Result(property = "createdBy", column = "created_by")
+            @Result(property = "fullName", column = "full_name"),
+            @Result(property = "password", column = "password"),
+            @Result(property = "createdAt", column = "created_at")
     })
     @Select("""
-                SELECT * FROM app_users
-                WHERE email = #{email};
+                SELECT id, email, full_name ,password, created_at FROM users
+                WHERE email = #{email}
             """)
     AppUser getUserByEmail(String email);
 
     @Select("""
-                SELECT name FROM app_roles ar
-                INNER JOIN app_user_role ur
-                ON ar.role_id = ur.role_id
-                WHERE user_id = #{userId}
-                LIMIT 1;
-            """)
-    String getRoleByUserId(Long userId);
-
-    @Select("""
-                INSERT INTO app_users (full_name, email, password, created_by)
-                VALUES (#{request.username}, #{request.email}, #{request.password}, #{createdBy})
-                RETURNING *
+                INSERT INTO users (email,full_name, password)
+                VALUES (#{request.email},#{request.fullName}, #{request.password})
+                RETURNING id, email, full_name, password, created_at
             """)
     @ResultMap("appUserMapper")
-    AppUser register(@Param("request") AppUserRequest request, @Param("createdBy") Long createdBy);
-
-    @Insert("""
-                INSERT INTO app_user_role
-                VALUES (#{userId}, #{roleId})
-            """)
-    void insertUserIdAndRoleId(Long roleId, Long userId);
+    AppUser register(@Param("request") AppUserRequest request);
 
     @Select("""
-                SELECT * FROM app_users
-                WHERE user_id = #{userId}
+                SELECT id, email, full_name,password, created_at FROM users
+                WHERE id = #{id}
             """)
     @ResultMap("appUserMapper")
-    AppUser getUserById(Long userId);
+    AppUser getUserById(Long id);
 
     @Select("""
-                SELECT * FROM app_users
-                ORDER BY user_id
+                SELECT id, email, full_name,password, created_at FROM users
+                ORDER BY id
                 LIMIT #{size} OFFSET #{offset}
             """)
     @ResultMap("appUserMapper")
     List<AppUser> findAllPaged(@Param("size") int size, @Param("offset") int offset);
 
     @Select("""
-                SELECT COUNT(*) FROM app_users
+                SELECT COUNT(*) FROM users
             """)
     long countAll();
 
     @Select("""
-                SELECT * FROM app_users
-                WHERE created_by = #{creatorId}
-                ORDER BY user_id
+                SELECT id, email, full_name,password, created_at FROM users
+                WHERE 1=0 /* findAllByCreatorId not supported - creators removed */
+                ORDER BY id
                 LIMIT #{size} OFFSET #{offset}
             """)
     @ResultMap("appUserMapper")
     List<AppUser> findAllByCreatorIdPaged(@Param("creatorId") Long creatorId, @Param("size") int size, @Param("offset") int offset);
 
     @Select("""
-                SELECT COUNT(*) FROM app_users
-                WHERE created_by = #{creatorId}
+                SELECT 0 /* countByCreatorId not supported - creators removed */
             """)
     long countByCreatorId(Long creatorId);
 
     @Update("""
-                UPDATE app_users SET full_name = #{request.username}, email = #{request.email}
-                WHERE user_id = #{userId}
-                RETURNING *
+                UPDATE users SET email = #{request.email}, full_name = #{request.fullName}
+                WHERE id = #{id}
+                RETURNING id, email, full_name, password, created_at
             """)
     @ResultMap("appUserMapper")
-    AppUser update(@Param("userId") Long userId, @Param("request") AppUserRequest request);
+    AppUser update(@Param("id") Long id, @Param("request") AppUserRequest request);
 
     @Delete("""
-                DELETE FROM app_users WHERE user_id = #{userId}
+                DELETE FROM users WHERE id = #{id}
             """)
-    void delete(Long userId);
+    void delete(Long id);
 
 }
