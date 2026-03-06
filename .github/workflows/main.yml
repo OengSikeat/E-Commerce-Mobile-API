@@ -14,7 +14,11 @@ jobs:
     steps:
       - name: checkout-code
         uses: actions/checkout@v4
-
+      - name: Debug secret
+        run: |
+          echo "Host: ${{ secrets.SERVER_HOST }}"
+          echo "User: ${{ secrets.SERVER_USER }}"
+          echo "Key exists: ${{ secrets.SERVER_SSH_KEY }}"
       - name: Deploy-using-ssh
         uses: appleboy/ssh-action@v0.1.6
         with:
@@ -28,8 +32,4 @@ jobs:
             ./gradlew build -x test
             docker compose down
             docker compose up --build -d
-      - name: Debug secret
-        run: |
-          echo "Host: ${{ secrets.SERVER_HOST }}"
-          echo "User: ${{ secrets.SERVER_USER }}"
-          echo "Key exists: ${{ secrets.SERVER_SSH_KEY }}"
+
