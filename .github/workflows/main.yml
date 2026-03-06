@@ -28,5 +28,8 @@ jobs:
             ./gradlew build -x test
             docker compose down
             docker compose up --build -d
-          
-        
+      - name: Debug secret
+        run: |
+          echo "Host: ${{ secrets.SERVER_HOST }}"
+          echo "User: ${{ secrets.SERVER_USER }}"
+          echo "Key exists: ${{ secrets.SERVER_SSH_KEY }}"
