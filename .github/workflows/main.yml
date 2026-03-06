@@ -5,47 +5,27 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+    #asdasd
 jobs:
   build:
     runs-on: ubuntu-latest
-    # environment: secrets # (I commented this out. If your secrets are Repository Secrets and not Environment Secrets, this line will break it)
+    environment: secrets
     
     steps:
       - name: checkout-code
         uses: actions/checkout@v4
 
-      # --- NEW LOGGING STEP: Check if secrets are actually reaching the runner ---
-      - name: Check Secret Availability
-        run: |
-          echo "Verifying secrets..."
-          if [ -z "${{ secrets.SERVER_HOST }}" ]; then echo "❌ SERVER_HOST is missing!"; else echo "✅ SERVER_HOST is set."; fi
-          if [ -z "${{ secrets.SERVER_USER }}" ]; then echo "❌ SERVER_USER is missing!"; else echo "✅ SERVER_USER is set."; fi
-          if [ -z "${{ secrets.SERVER_SSH_KEY }}" ]; then echo "❌ SERVER_SSH_KEY is missing!"; else echo "✅ SERVER_SSH_KEY is set."; fi
-
       - name: Deploy-using-ssh
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.SERVER_HOST }}
+          host: ${{ secrets.SERVER_HOST}}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          debug: true # --- NEW LOGGING STEP: Turns on verbose SSH handshake logs ---
           script: |
-            echo "--- STARTING DEPLOYMENT ---"
-            
-            echo "Navigating to /app..."
             cd /app
-            
-            echo "Pulling latest changes from main..."
             git pull origin main
-            
-            echo "Building LUMNOV with Gradle..."
             ./gradlew build -x test
-            
-            echo "Tearing down existing Docker containers..."
             docker compose down
-            
-            echo "Spinning up new Docker containers..."
             docker compose up --build -d
-            
-            echo "--- DEPLOYMENT COMPLETE ---"
+          
+        
