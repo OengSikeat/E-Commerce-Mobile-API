@@ -1,7 +1,11 @@
 package org.example.basiclogin.exception;
 
+import org.example.basiclogin.utils.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -63,6 +67,46 @@ public class GlobalException{
         ));
 
         return problemDetail;
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUnauthorized(UnauthorizedException e) {
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .success(false)
+                .message(e.getMessage())
+                .status(HttpStatus.UNAUTHORIZED)
+                .build();
+        return new ResponseEntity<>(apiResponse, apiResponse.getStatus());
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAuthentication(AuthenticationException e) {
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .success(false)
+                .message("Unauthorized")
+                .status(HttpStatus.UNAUTHORIZED)
+                .build();
+        return new ResponseEntity<>(apiResponse, apiResponse.getStatus());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAccessDenied(AccessDeniedException e) {
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .success(false)
+                .message("Forbidden")
+                .status(HttpStatus.FORBIDDEN)
+                .build();
+        return new ResponseEntity<>(apiResponse, apiResponse.getStatus());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Object>> handleAny(Exception e) {
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .success(false)
+                .message(e.getMessage() != null ? e.getMessage() : "Internal server error")
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .build();
+        return new ResponseEntity<>(apiResponse, apiResponse.getStatus());
     }
 
 }

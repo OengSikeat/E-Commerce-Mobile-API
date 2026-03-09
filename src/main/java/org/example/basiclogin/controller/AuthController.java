@@ -10,6 +10,8 @@ import org.example.basiclogin.model.Response.AppUserResponse;
 import org.example.basiclogin.service.AppUserService;
 import org.example.basiclogin.utils.ApiResponse;
 import org.example.basiclogin.utils.BaseResponse;
+import org.example.basiclogin.model.Entity.AppUser;
+import org.example.basiclogin.utils.SecurityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +19,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,5 +57,17 @@ public class AuthController extends BaseResponse {
         return responseEntity(true, "User registered", HttpStatus.CREATED, appUserService.register(request));
     }
 
+    @GetMapping("/profile")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<ApiResponse<AppUserResponse>> profile() {
+        AppUser user = SecurityUtils.currentUser();
+        AppUserResponse response = AppUserResponse.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .createdAt(user.getCreatedAt())
+                .build();
+        return responseEntity(true, "Profile fetched", HttpStatus.OK, response);
+    }
 
 }

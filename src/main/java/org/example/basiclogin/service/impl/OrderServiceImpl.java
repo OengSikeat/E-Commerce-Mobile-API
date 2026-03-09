@@ -84,70 +84,116 @@ public class OrderServiceImpl implements OrderService {
         return product.getPrice().multiply(BigDecimal.valueOf(quantity));
     }
 
+    private AppUser requireUser(Long userId) {
+        AppUser user = appUserRepository.getUserByIdLite(userId);
+        if (user == null) {
+            throw new NotFoundException("User not found");
+        }
+        return user;
+    }
+
+    private Product requireProduct(Long productId) {
+        if (productId == null) {
+            throw new BadRequestException("Product id is required");
+        }
+        Product product = productRepository.findById(productId);
+        if (product == null) {
+            throw new NotFoundException("Product not found");
+        }
+        return product;
+    }
+
+    private Order requireOrder(Long id) {
+        if (id == null) {
+            throw new BadRequestException("Order id is required");
+        }
+        Order order = orderRepository.findById(id);
+        if (order == null) {
+            throw new NotFoundException("Order not found");
+        }
+        return order;
+    }
+
+    private int requireQuantity(Integer quantity) {
+        int qty = quantity == null ? 0 : quantity;
+        if (qty < 1) {
+            throw new BadRequestException("Quantity must be at least 1");
+        }
+        return qty;
+    }
+
     @Override
     public OrderResponse create(OrderRequest request) {
+        if (request == null) {
+            throw new BadRequestException("Request body is required");
+        }
         validateStatus(request.getStatus());
 
         Long currentUserId = SecurityUtils.currentUserId();
-        AppUser user = appUserRepository.getUserByIdLite(currentUserId);
-        if (user == null) throw new NotFoundException("User not found");
+        AppUser user = requireUser(currentUserId);
+        Product product = requireProduct(request.getProductId());
 
-        Product product = productRepository.findById(request.getProductId());
-        if (product == null) throw new NotFoundException("Product not found");
-
-        int qty = request.getQuantity() == null ? 0 : request.getQuantity();
-        if (qty < 1) throw new BadRequestException("Quantity must be at least 1");
-
+        int qty = requireQuantity(request.getQuantity());
         BigDecimal total = calculateTotal(product, qty);
-        Order created = orderRepository.create(user.getId(), product.getId(), qty, total, request.getStatus().trim().toLowerCase());
+
+        Order created = orderRepository.create(
+                user.getId(),
+                product.getId(),
+                qty,
+                total,
+                request.getStatus().trim().toLowerCase()
+        );
         return toResponse(created, user, product);
     }
 
     @Override
     public List<OrderResponse> getAll() {
         return orderRepository.findAll().stream().map(order -> {
-            AppUser user = appUserRepository.getUserByIdLite(order.getUserId());
-            Product product = productRepository.findById(order.getProductId());
+            AppUser user = requireUser(order.getUserId());
+            Product product = requireProduct(order.getProductId());
             return toResponse(order, user, product);
         }).toList();
     }
 
     @Override
     public OrderResponse getById(Long id) {
-        Order order = orderRepository.findById(id);
-        if (order == null) throw new NotFoundException("Order not found");
-
-        AppUser user = appUserRepository.getUserByIdLite(order.getUserId());
-        Product product = productRepository.findById(order.getProductId());
+        Order order = requireOrder(id);
+        AppUser user = requireUser(order.getUserId());
+        Product product = requireProduct(order.getProductId());
         return toResponse(order, user, product);
     }
 
     @Override
     public OrderResponse update(Long id, OrderRequest request) {
-        Order existing = orderRepository.findById(id);
-        if (existing == null) throw new NotFoundException("Order not found");
+        if (request == null) {
+            throw new BadRequestException("Request body is required");
+        }
+        Order existing = requireOrder(id);
 
         validateStatus(request.getStatus());
 
+        // Always use the current authenticated user for updates.
         Long currentUserId = SecurityUtils.currentUserId();
-        AppUser user = appUserRepository.getUserByIdLite(currentUserId);
-        if (user == null) throw new NotFoundException("User not found");
+        AppUser user = requireUser(currentUserId);
 
-        Product product = productRepository.findById(request.getProductId());
-        if (product == null) throw new NotFoundException("Product not found");
-
-        int qty = request.getQuantity() == null ? 0 : request.getQuantity();
-        if (qty < 1) throw new BadRequestException("Quantity must be at least 1");
+        Product product = requireProduct(request.getProductId());
+        int qty = requireQuantity(request.getQuantity());
 
         BigDecimal total = calculateTotal(product, qty);
-        Order updated = orderRepository.update(id, user.getId(), product.getId(), qty, total, request.getStatus().trim().toLowerCase());
+        Order updated = orderRepository.update(
+                existing.getId(),
+                user.getId(),
+                product.getId(),
+                qty,
+                total,
+                request.getStatus().trim().toLowerCase()
+        );
         return toResponse(updated, user, product);
     }
 
     @Override
     public void delete(Long id) {
-        Order existing = orderRepository.findById(id);
-        if (existing == null) throw new NotFoundException("Order not found");
+        requireOrder(id);
         orderRepository.delete(id);
     }
 }
