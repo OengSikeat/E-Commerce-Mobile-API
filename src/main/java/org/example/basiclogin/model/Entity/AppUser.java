@@ -20,7 +20,6 @@ public class AppUser implements UserDetails {
     private String fullName;
     private String email;
     private String password;
-    private String profile;
     private LocalDateTime createdAt;
 
     @Override
