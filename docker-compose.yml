@@ -7,7 +7,7 @@ services:
       - e_commerce_db_data:/var/lib/postgresql
       - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: e_commerce_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: keat6951
     ports:
@@ -27,7 +27,7 @@ services:
     ports:
       - "8081:9090"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://e_commerce-db:5432/postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://e_commerce-db:5432/e_commerce_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: keat6951
     depends_on:
