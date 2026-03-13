@@ -1,8 +1,6 @@
 package org.example.basiclogin.model.Request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,18 +9,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AppUserRequest {
-    @NotBlank(message = "Email is required")
+public class UpdateProfileRequest {
+    // Allow partial updates; validate formats when present
+    private String fullName;
+
     @Email(message = "Email must be valid")
-    @Schema(defaultValue = "string@gmail.com", example = "string@gmail.com")
     private String email;
 
-    @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
-
-    @NotBlank(message = "Confirm password is required")
-    private String confirmPassword;
-
-    private String fullName;
 }

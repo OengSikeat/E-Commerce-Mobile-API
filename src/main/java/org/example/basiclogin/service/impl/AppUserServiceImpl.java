@@ -35,6 +35,11 @@ public class AppUserServiceImpl implements AppUserService {
             throw new BadRequestException("Email already in use");
         }
 
+        if (request.getPassword() == null || request.getConfirmPassword() == null ||
+                !request.getPassword().equals(request.getConfirmPassword())) {
+            throw new BadRequestException("Password and confirmPassword must match");
+        }
+
         request.setPassword(passwordEncoder.encode(request.getPassword()));
 
         AppUser appUser = appUserRepository.register(request);

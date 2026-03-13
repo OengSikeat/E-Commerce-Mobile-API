@@ -1,5 +1,6 @@
 package org.example.basiclogin.model.Response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,5 +21,10 @@ public class OrderResponse {
     private Integer quantity;
     private BigDecimal totalAmount;
     private String status;
+    private String address;
+    private String city;
+    private String state;
+    private String country;
+    private String postcode;
     private LocalDateTime createdAt;
 }

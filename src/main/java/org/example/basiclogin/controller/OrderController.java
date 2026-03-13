@@ -3,6 +3,7 @@ package org.example.basiclogin.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.basiclogin.model.Enum.OrderStatus;
 import org.example.basiclogin.model.Request.OrderRequest;
 import org.example.basiclogin.model.Response.OrderResponse;
 import org.example.basiclogin.service.OrderService;
@@ -18,7 +19,6 @@ import java.util.List;
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
-
 public class OrderController extends BaseResponse {
 
     private final OrderService orderService;
@@ -48,5 +48,11 @@ public class OrderController extends BaseResponse {
         orderService.delete(id);
         return responseEntity(true, "Order deleted", HttpStatus.OK);
     }
-}
 
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<OrderResponse>> updateStatus(@PathVariable Long id,
+                                                                   @RequestParam OrderStatus status) {
+        return responseEntity(true, "Order status updated", HttpStatus.OK,
+                orderService.updateStatus(id, status));
+    }
+}

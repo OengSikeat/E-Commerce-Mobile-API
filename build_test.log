@@ -1,0 +1,110 @@
+Initialized native services in: C:\Users\Admin\.gradle\native
+Initialized jansi services in: C:\Users\Admin\.gradle\native
+Found daemon DaemonInfo{pid=11608, address=[a8b9d7ec-e92c-4fd8-b613-ce6b33e2f294 port:51376, addresses:[/127.0.0.1]], state=Idle, lastBusy=1773369061203, context=DefaultDaemonContext[uid=10d61782-6104-4b0e-867b-2c3ff5481eec,javaHome=C:\Program Files\Java\jdk-17,javaVersion=17,javaVendor=Oracle Corporation,daemonRegistryDir=C:\Users\Admin\.gradle\daemon,pid=11608,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-XX:MaxMetaspaceSize=384m,-XX:+HeapDumpOnOutOfMemoryError,-Xms256m,-Xmx512m,-Dfile.encoding=UTF-8,-Duser.country=US,-Duser.language=en,-Duser.variant]} however its context does not match the desired criteria.
+At least one daemon option is different.
+Wanted: DaemonRequestContext{jvmCriteria=C:\Program Files\Java\jdk-17 (no Daemon JVM specified, using current Java home), daemonOpts=[-XX:MaxMetaspaceSize=384m, -XX:+HeapDumpOnOutOfMemoryError, -Xms256m, -Xmx512m, -Dfile.encoding=windows-1252, -Duser.country=US, -Duser.language=en, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+Actual: DefaultDaemonContext[uid=10d61782-6104-4b0e-867b-2c3ff5481eec,javaHome=C:\Program Files\Java\jdk-17,javaVersion=17,javaVendor=Oracle Corporation,daemonRegistryDir=C:\Users\Admin\.gradle\daemon,pid=11608,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-XX:MaxMetaspaceSize=384m,-XX:+HeapDumpOnOutOfMemoryError,-Xms256m,-Xmx512m,-Dfile.encoding=UTF-8,-Duser.country=US,-Duser.language=en,-Duser.variant]
+
+  Looking for a different daemon...
+The client will now receive all logging from the daemon (pid: 800). The daemon log file: C:\Users\Admin\.gradle\daemon\9.3.0\daemon-800.out.log
+Starting 15th build in daemon [uptime: 23 mins 58.576 secs, performance: 100%, GC rate: 0.00/s, heap usage: 0% of 512 MiB, non-heap usage: 18% of 384 MiB]
+Using 20 worker leases.
+Operational build model parameters: {requiresToolingModels=false, parallelProjectExecution=false, configureOnDemand=false, configurationCache=false, configurationCacheParallelStore=false, configurationCacheParallelLoad=true, isolatedProjects=false, parallelProjectConfiguration=false, intermediateModelCache=false, parallelToolingApiActions=false, invalidateCoupledProjects=false, modelAsProjectDependency=false, resilientModelBuilding=false}
+Now considering [D:\Code\e-commerce] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Starting Build
+Settings evaluated using settings file 'D:\Code\e-commerce\settings.gradle'.
+Projects loaded. Root project using build file 'D:\Code\e-commerce\build.gradle'.
+Included projects: [root project 'BasicLogin']
+
+> Configure project :
+Evaluating root project 'BasicLogin' using build file 'D:\Code\e-commerce\build.gradle'.
+Resolved plugin [id: 'java']
+Resolved plugin [id: 'org.springframework.boot', version: '4.0.2']
+Resolved plugin [id: 'io.spring.dependency-management', version: '1.1.7']
+Applying dependency management to configuration 'annotationProcessor' in project 'BasicLogin'
+Applying dependency management to configuration 'apiElements' in project 'BasicLogin'
+Applying dependency management to configuration 'archives' in project 'BasicLogin'
+Applying dependency management to configuration 'bootArchives' in project 'BasicLogin'
+Applying dependency management to configuration 'compileClasspath' in project 'BasicLogin'
+Applying dependency management to configuration 'compileOnly' in project 'BasicLogin'
+Applying dependency management to configuration 'default' in project 'BasicLogin'
+Applying dependency management to configuration 'developmentOnly' in project 'BasicLogin'
+Applying dependency management to configuration 'implementation' in project 'BasicLogin'
+Applying dependency management to configuration 'mainSourceElements' in project 'BasicLogin'
+Applying dependency management to configuration 'productionRuntimeClasspath' in project 'BasicLogin'
+Applying dependency management to configuration 'runtimeClasspath' in project 'BasicLogin'
+Applying dependency management to configuration 'runtimeElements' in project 'BasicLogin'
+Applying dependency management to configuration 'runtimeOnly' in project 'BasicLogin'
+Applying dependency management to configuration 'testAndDevelopmentOnly' in project 'BasicLogin'
+Applying dependency management to configuration 'testAnnotationProcessor' in project 'BasicLogin'
+Applying dependency management to configuration 'testCompileClasspath' in project 'BasicLogin'
+Applying dependency management to configuration 'testCompileOnly' in project 'BasicLogin'
+Applying dependency management to configuration 'testImplementation' in project 'BasicLogin'
+Applying dependency management to configuration 'testResultsElementsForTest' in project 'BasicLogin'
+Applying dependency management to configuration 'testRuntimeClasspath' in project 'BasicLogin'
+Applying dependency management to configuration 'testRuntimeOnly' in project 'BasicLogin'
+All projects evaluated.
+Task name matched 'test'
+Selected primary task 'test' from project :
+Resolving global dependency management for project 'BasicLogin'
+Excluding []
+Excluding []
+Excluding []
+Excluding []
+Excluding []
+Excluding []
+Tasks to be executed: [task ':compileJava', task ':processResources', task ':classes', task ':compileTestJava', task ':processTestResources', task ':testClasses', task ':test']
+Tasks that were excluded: []
+Resolve mutations for :compileJava (Thread[Execution worker,5,main]) started.
+:compileJava (Thread[Execution worker,5,main]) started.
+
+> Task :compileJava UP-TO-DATE
+Custom actions are attached to task ':compileJava'.
+Caching disabled for task ':compileJava' because:
+  Build cache is disabled
+Skipping task ':compileJava' as it is up-to-date.
+Resolve mutations for :processResources (Thread[Execution worker,5,main]) started.
+:processResources (Thread[Execution worker,5,main]) started.
+
+> Task :processResources UP-TO-DATE
+Caching disabled for task ':processResources' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':processResources' as it is up-to-date.
+Resolve mutations for :classes (Thread[Execution worker,5,main]) started.
+:classes (Thread[Execution worker,5,main]) started.
+
+> Task :classes UP-TO-DATE
+Skipping task ':classes' as it has no actions.
+Resolve mutations for :compileTestJava (Thread[Execution worker,5,main]) started.
+:compileTestJava (Thread[Execution worker,5,main]) started.
+
+> Task :compileTestJava UP-TO-DATE
+Custom actions are attached to task ':compileTestJava'.
+Caching disabled for task ':compileTestJava' because:
+  Build cache is disabled
+Skipping task ':compileTestJava' as it is up-to-date.
+Resolve mutations for :processTestResources (Thread[Execution worker,5,main]) started.
+:processTestResources (Thread[Execution worker Thread 4,5,main]) started.
+
+> Task :processTestResources NO-SOURCE
+Skipping task ':processTestResources' as it has no source files and no previous output files.
+Resolve mutations for :testClasses (Thread[Execution worker Thread 4,5,main]) started.
+:testClasses (Thread[Execution worker Thread 12,5,main]) started.
+
+> Task :testClasses UP-TO-DATE
+Skipping task ':testClasses' as it has no actions.
+Resolve mutations for :test (Thread[Execution worker Thread 12,5,main]) started.
+:test (Thread[Execution worker Thread 12,5,main]) started.
+
+> Task :test UP-TO-DATE
+Caching disabled for task ':test' because:
+  Build cache is disabled
+Skipping task ':test' as it is up-to-date.
+
+BUILD SUCCESSFUL in 1s
+4 actionable tasks: 4 up-to-date
+Watched directory hierarchies: [D:\Code\e-commerce]
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.3.0/userguide/configuration_cache_enabling.html

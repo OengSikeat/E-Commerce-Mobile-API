@@ -27,6 +27,5 @@ public class ProductRequest {
 
     private String sizeOptions;
 
-    private Boolean onPromotion;
+    // keep for update (optional), but not required for create (controller sets it)
 }
-

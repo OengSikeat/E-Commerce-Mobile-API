@@ -1,7 +1,6 @@
 package org.example.basiclogin.model.Request;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +18,9 @@ public class OrderRequest {
     @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;
 
-    @NotBlank(message = "Status is required")
-    private String status; // pending|shipped|delivered
+    private String address;
+    private String city;
+    private String state;
+    private String country;
+    private String postcode;
 }

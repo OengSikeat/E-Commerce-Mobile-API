@@ -6,6 +6,7 @@ import org.example.basiclogin.exception.NotFoundException;
 import org.example.basiclogin.model.Entity.AppUser;
 import org.example.basiclogin.model.Entity.Order;
 import org.example.basiclogin.model.Entity.Product;
+import org.example.basiclogin.model.Enum.OrderStatus;
 import org.example.basiclogin.model.Request.OrderRequest;
 import org.example.basiclogin.model.Response.AppUserResponse;
 import org.example.basiclogin.model.Response.OrderResponse;
@@ -19,13 +20,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
-
-    private static final Set<String> ALLOWED_STATUSES = Set.of("pending", "shipped", "delivered");
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
@@ -63,18 +61,13 @@ public class OrderServiceImpl implements OrderService {
                 .quantity(o.getQuantity())
                 .totalAmount(o.getTotalAmount())
                 .status(o.getStatus())
+                .address(o.getAddress())
+                .city(o.getCity())
+                .state(o.getState())
+                .country(o.getCountry())
+                .postcode(o.getPostcode())
                 .createdAt(o.getCreatedAt())
                 .build();
-    }
-
-    private void validateStatus(String status) {
-        if (status == null || status.isBlank()) {
-            throw new BadRequestException("Status is required");
-        }
-        String normalized = status.trim().toLowerCase();
-        if (!ALLOWED_STATUSES.contains(normalized)) {
-            throw new BadRequestException("Invalid status. Allowed values: pending, shipped, delivered");
-        }
     }
 
     private BigDecimal calculateTotal(Product product, int quantity) {
@@ -127,23 +120,26 @@ public class OrderServiceImpl implements OrderService {
         if (request == null) {
             throw new BadRequestException("Request body is required");
         }
-        validateStatus(request.getStatus());
 
-        Long currentUserId = SecurityUtils.currentUserId();
-        AppUser user = requireUser(currentUserId);
+        AppUser currentUser = SecurityUtils.currentUser();
         Product product = requireProduct(request.getProductId());
-
         int qty = requireQuantity(request.getQuantity());
-        BigDecimal total = calculateTotal(product, qty);
+        BigDecimal totalAmount = calculateTotal(product, qty);
 
         Order created = orderRepository.create(
-                user.getId(),
+                currentUser.getId(),
                 product.getId(),
                 qty,
-                total,
-                request.getStatus().trim().toLowerCase()
+                totalAmount,
+                OrderStatus.PENDING.dbValue(),
+                request.getAddress(),
+                request.getCity(),
+                request.getState(),
+                request.getCountry(),
+                request.getPostcode()
         );
-        return toResponse(created, user, product);
+
+        return toResponse(created, currentUser, product);
     }
 
     @Override
@@ -170,25 +166,25 @@ public class OrderServiceImpl implements OrderService {
         }
         Order existing = requireOrder(id);
 
-        validateStatus(request.getStatus());
-
-        // Always use the current authenticated user for updates.
-        Long currentUserId = SecurityUtils.currentUserId();
-        AppUser user = requireUser(currentUserId);
-
+        AppUser currentUser = requireUser(existing.getUserId());
         Product product = requireProduct(request.getProductId());
         int qty = requireQuantity(request.getQuantity());
 
         BigDecimal total = calculateTotal(product, qty);
         Order updated = orderRepository.update(
                 existing.getId(),
-                user.getId(),
+                existing.getUserId(),
                 product.getId(),
                 qty,
                 total,
-                request.getStatus().trim().toLowerCase()
+                existing.getStatus(),
+                request.getAddress(),
+                request.getCity(),
+                request.getState(),
+                request.getCountry(),
+                request.getPostcode()
         );
-        return toResponse(updated, user, product);
+        return toResponse(updated, currentUser, product);
     }
 
     @Override
@@ -196,5 +192,18 @@ public class OrderServiceImpl implements OrderService {
         requireOrder(id);
         orderRepository.delete(id);
     }
-}
 
+    @Override
+    public OrderResponse updateStatus(Long id, OrderStatus status) {
+        if (status == null) throw new BadRequestException("status is required");
+        Order existing = requireOrder(id);
+
+        int updatedRows = orderRepository.updateStatus(existing.getId(), status.dbValue());
+        if (updatedRows == 0) throw new NotFoundException("Order not found");
+
+        Order updated = requireOrder(id);
+        AppUser user = requireUser(updated.getUserId());
+        Product product = requireProduct(updated.getProductId());
+        return toResponse(updated, user, product);
+    }
+}

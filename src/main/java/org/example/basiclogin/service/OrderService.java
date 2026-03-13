@@ -1,5 +1,6 @@
 package org.example.basiclogin.service;
 
+import org.example.basiclogin.model.Enum.OrderStatus;
 import org.example.basiclogin.model.Request.OrderRequest;
 import org.example.basiclogin.model.Response.OrderResponse;
 
@@ -11,5 +12,5 @@ public interface OrderService {
     OrderResponse getById(Long id);
     OrderResponse update(Long id, OrderRequest request);
     void delete(Long id);
+    OrderResponse updateStatus(Long id, OrderStatus status);
 }
-

@@ -19,6 +19,10 @@ public class Order {
     private Integer quantity;
     private BigDecimal totalAmount;
     private String status;
+    private String address;
+    private String city;
+    private String state;
+    private String country;
+    private String postcode;
     private LocalDateTime createdAt;
 }
-

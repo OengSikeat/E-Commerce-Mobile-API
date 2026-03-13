@@ -15,17 +15,24 @@ public interface OrderRepository {
             @Result(property = "quantity", column = "quantity"),
             @Result(property = "totalAmount", column = "total_amount"),
             @Result(property = "status", column = "status"),
+            @Result(property = "address", column = "address"),
+            @Result(property = "city", column = "city"),
+            @Result(property = "state", column = "state"),
+            @Result(property = "country", column = "country"),
+            @Result(property = "postcode", column = "postcode"),
             @Result(property = "createdAt", column = "created_at")
     })
     @Select("""
-            SELECT id, user_id, product_id, quantity, total_amount, status, created_at
+            SELECT id, user_id, product_id, quantity, total_amount, status,
+                   address, city, state, country, postcode, created_at
             FROM orders
             WHERE id = #{id}
             """)
     Order findById(Long id);
 
     @Select("""
-            SELECT id, user_id, product_id, quantity, total_amount, status, created_at
+            SELECT id, user_id, product_id, quantity, total_amount, status,
+                   address, city, state, country, postcode, created_at
             FROM orders
             ORDER BY id
             """)
@@ -33,16 +40,22 @@ public interface OrderRepository {
     List<Order> findAll();
 
     @Select("""
-            INSERT INTO orders (user_id, product_id, quantity, total_amount, status)
-            VALUES (#{userId}, #{productId}, #{quantity}, #{totalAmount}, #{status})
-            RETURNING id, user_id, product_id, quantity, total_amount, status, created_at
+            INSERT INTO orders (user_id, product_id, quantity, total_amount, status, address, city, state, country, postcode)
+            VALUES (#{userId}, #{productId}, #{quantity}, #{totalAmount}, #{status}, #{address}, #{city}, #{state}, #{country}, #{postcode})
+            RETURNING id, user_id, product_id, quantity, total_amount, status,
+                      address, city, state, country, postcode, created_at
             """)
     @ResultMap("orderMapper")
     Order create(@Param("userId") Long userId,
                  @Param("productId") Long productId,
                  @Param("quantity") Integer quantity,
                  @Param("totalAmount") java.math.BigDecimal totalAmount,
-                 @Param("status") String status);
+                 @Param("status") String status,
+                 @Param("address") String address,
+                 @Param("city") String city,
+                 @Param("state") String state,
+                 @Param("country") String country,
+                 @Param("postcode") String postcode);
 
     @Update("""
             UPDATE orders
@@ -50,9 +63,15 @@ public interface OrderRepository {
                 product_id = #{productId},
                 quantity = #{quantity},
                 total_amount = #{totalAmount},
-                status = #{status}
+                status = #{status},
+                address = #{address},
+                city = #{city},
+                state = #{state},
+                country = #{country},
+                postcode = #{postcode}
             WHERE id = #{id}
-            RETURNING id, user_id, product_id, quantity, total_amount, status, created_at
+            RETURNING id, user_id, product_id, quantity, total_amount, status,
+                      address, city, state, country, postcode, created_at
             """)
     @ResultMap("orderMapper")
     Order update(@Param("id") Long id,
@@ -60,11 +79,22 @@ public interface OrderRepository {
                  @Param("productId") Long productId,
                  @Param("quantity") Integer quantity,
                  @Param("totalAmount") java.math.BigDecimal totalAmount,
-                 @Param("status") String status);
+                 @Param("status") String status,
+                 @Param("address") String address,
+                 @Param("city") String city,
+                 @Param("state") String state,
+                 @Param("country") String country,
+                 @Param("postcode") String postcode);
 
     @Delete("""
             DELETE FROM orders WHERE id = #{id}
             """)
     void delete(Long id);
-}
 
+    @Update("""
+            UPDATE orders
+            SET status = #{status}
+            WHERE id = #{id}
+            """)
+    int updateStatus(@Param("id") Long id, @Param("status") String status);
+}
