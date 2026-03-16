@@ -21,7 +21,7 @@ public interface ProductService {
 
     ProductResponse update(Long id, ProductRequest request);
 
-    void delete(Long id);
-
     ProductResponse updateDiscount(Long id, org.example.basiclogin.model.Request.DiscountRequest request);
+
+    List<ProductResponse> getWaitlistedProducts(Long userId);
 }

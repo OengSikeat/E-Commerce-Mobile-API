@@ -120,4 +120,17 @@ public interface ProductRepository {
 
     @Delete("DELETE FROM products WHERE id = #{id}")
     void delete(Long id);
+
+    @Select("""
+            <script>
+            SELECT p.id, p.name, p.description, p.price, p.image_url, p.size_options,
+                   p.category, p.discount_percentage, p.created_by, p.on_promotion, p.created_at
+            FROM products p
+            INNER JOIN waitlists w ON w.product_id = p.id
+            WHERE w.user_id = #{userId}
+            ORDER BY w.id DESC
+            </script>
+            """)
+    @ResultMap("productMapper")
+    List<Product> findWaitlistedProductsByUserId(@Param("userId") Long userId);
 }

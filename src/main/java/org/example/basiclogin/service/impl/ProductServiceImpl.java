@@ -129,4 +129,15 @@ public class ProductServiceImpl implements ProductService {
         if (updated == null) throw new NotFoundException("Product not found");
         return toResponse(updated);
     }
+
+    @Override
+    public List<ProductResponse> getWaitlistedProducts(Long userId) {
+        if (userId == null) {
+            throw new BadRequestException("User ID is required to fetch waitlisted products");
+        }
+        return productRepository.findWaitlistedProductsByUserId(userId)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
 }

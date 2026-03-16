@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.example.basiclogin.utils.SecurityUtils;
+
 import java.util.List;
 import java.util.Map;
 
@@ -78,5 +80,11 @@ public class ProductController extends BaseResponse {
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         productService.delete(id);
         return responseEntity(true, "Product deleted", HttpStatus.OK);
+    }
+
+    @GetMapping("/waitlist")
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getWaitlistedProducts() {
+        Long userId = SecurityUtils.currentUserId();
+        return responseEntity(true, "Waitlist fetched", HttpStatus.OK, productService.getWaitlistedProducts(userId));
     }
 }
