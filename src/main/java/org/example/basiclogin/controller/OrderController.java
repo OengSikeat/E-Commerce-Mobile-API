@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.basiclogin.model.Enum.OrderStatus;
 import org.example.basiclogin.model.Request.OrderRequest;
+import org.example.basiclogin.model.Request.UpdateOrderPaymentRequest;
 import org.example.basiclogin.model.Response.OrderResponse;
 import org.example.basiclogin.service.OrderService;
 import org.example.basiclogin.utils.ApiResponse;
@@ -54,5 +55,23 @@ public class OrderController extends BaseResponse {
                                                                    @RequestParam OrderStatus status) {
         return responseEntity(true, "Order status updated", HttpStatus.OK,
                 orderService.updateStatus(id, status));
+    }
+
+    @PatchMapping("/{id}/payment")
+    public ResponseEntity<ApiResponse<OrderResponse>> updatePaymentInfo(@PathVariable Long id,
+                                                                       @Valid @RequestBody UpdateOrderPaymentRequest request) {
+        return responseEntity(true, "Order payment info updated", HttpStatus.OK,
+                orderService.updatePaymentInfo(id, request.getQr(), request.getMd5()));
+    }
+
+    @PatchMapping("/{id}/payment/refresh")
+    public ResponseEntity<ApiResponse<OrderResponse>> refreshPaymentStatus(@PathVariable Long id) {
+        return responseEntity(true, "Order payment status refreshed", HttpStatus.OK,
+                orderService.refreshPaymentStatus(id));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getMyOrders() {
+        return responseEntity(true, "My orders fetched", HttpStatus.OK, orderService.getMyOrders());
     }
 }

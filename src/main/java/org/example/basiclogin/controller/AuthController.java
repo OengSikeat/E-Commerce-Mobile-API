@@ -71,6 +71,7 @@ public class AuthController extends BaseResponse {
                 .id(user.getId())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
+                .role(user.getRole() == null ? null : user.getRole().name())
                 .createdAt(user.getCreatedAt())
                 .build();
         return responseEntity(true, "Profile fetched", HttpStatus.OK, response);

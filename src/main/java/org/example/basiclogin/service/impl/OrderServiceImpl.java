@@ -1,5 +1,8 @@
 package org.example.basiclogin.service.impl;
 
+import io.github.tongbora.bakong.dto.BakongResponse;
+import io.github.tongbora.bakong.dto.CheckTransactionRequest;
+import io.github.tongbora.bakong.service.BakongService;
 import lombok.RequiredArgsConstructor;
 import org.example.basiclogin.exception.BadRequestException;
 import org.example.basiclogin.exception.NotFoundException;
@@ -28,6 +31,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final AppUserRepository appUserRepository;
+    private final BakongService bakongService;
 
     private AppUserResponse toUserResponse(AppUser user) {
         if (user == null) return null;
@@ -61,12 +65,8 @@ public class OrderServiceImpl implements OrderService {
                 .quantity(o.getQuantity())
                 .totalAmount(o.getTotalAmount())
                 .status(o.getStatus())
-                .address(o.getAddress())
-                .city(o.getCity())
-                .state(o.getState())
-                .country(o.getCountry())
-                .postcode(o.getPostcode())
-                .createdAt(o.getCreatedAt())
+                .qr(o.getQr())
+                .md5(o.getMd5())
                 .build();
     }
 
@@ -115,6 +115,36 @@ public class OrderServiceImpl implements OrderService {
         return qty;
     }
 
+    private String safeBakongResponseMessage(BakongResponse response) {
+        if (response == null) return null;
+
+        // Try multiple possible accessors depending on the library version
+        String[] candidates = {"getResponseMessage", "getMessage", "getStatus", "responseMessage", "message", "status"};
+        for (String name : candidates) {
+            try {
+                var method = response.getClass().getMethod(name);
+                Object value = method.invoke(response);
+                if (value != null) return value.toString();
+            } catch (Exception ignored) {
+            }
+        }
+        return null;
+    }
+
+    private boolean isBakongSuccess(BakongResponse response) {
+        if (response == null) return false;
+
+        String msg = safeBakongResponseMessage(response);
+        if (msg != null) {
+            String normalized = msg.trim();
+            if (normalized.equalsIgnoreCase("success")) return true;
+        }
+
+        // Fallback: string search on toString() (last resort)
+        String asText = String.valueOf(response);
+        return asText.toLowerCase().contains("success");
+    }
+
     @Override
     public OrderResponse create(OrderRequest request) {
         if (request == null) {
@@ -132,11 +162,8 @@ public class OrderServiceImpl implements OrderService {
                 qty,
                 totalAmount,
                 OrderStatus.PENDING.dbValue(),
-                request.getAddress(),
-                request.getCity(),
-                request.getState(),
-                request.getCountry(),
-                request.getPostcode()
+                null,
+                null
         );
 
         return toResponse(created, currentUser, product);
@@ -178,11 +205,8 @@ public class OrderServiceImpl implements OrderService {
                 qty,
                 total,
                 existing.getStatus(),
-                request.getAddress(),
-                request.getCity(),
-                request.getState(),
-                request.getCountry(),
-                request.getPostcode()
+                existing.getQr(),
+                existing.getMd5()
         );
         return toResponse(updated, currentUser, product);
     }
@@ -205,5 +229,55 @@ public class OrderServiceImpl implements OrderService {
         AppUser user = requireUser(updated.getUserId());
         Product product = requireProduct(updated.getProductId());
         return toResponse(updated, user, product);
+    }
+
+    @Override
+    public OrderResponse updatePaymentInfo(Long id, String qr, String md5) {
+        Order existing = requireOrder(id);
+        if (qr == null || qr.isBlank()) throw new BadRequestException("qr is required");
+        if (md5 == null || md5.isBlank()) throw new BadRequestException("md5 is required");
+
+        int updated = orderRepository.updatePaymentInfo(existing.getId(), qr, md5);
+        if (updated == 0) throw new NotFoundException("Order not found");
+
+        Order reloaded = requireOrder(existing.getId());
+        AppUser user = requireUser(reloaded.getUserId());
+        Product product = requireProduct(reloaded.getProductId());
+        return toResponse(reloaded, user, product);
+    }
+
+    @Override
+    public OrderResponse refreshPaymentStatus(Long id) {
+        Order existing = requireOrder(id);
+        if (existing.getMd5() == null || existing.getMd5().isBlank()) {
+            throw new BadRequestException("Order md5 is missing");
+        }
+
+        CheckTransactionRequest check = new CheckTransactionRequest(existing.getMd5());
+
+        BakongResponse response = bakongService.checkTransactionByMD5(check);
+
+        boolean paid = isBakongSuccess(response);
+        OrderStatus newStatus = paid ? OrderStatus.PAID : OrderStatus.PENDING;
+
+        orderRepository.updateStatus(existing.getId(), newStatus.dbValue());
+
+        Order updated = requireOrder(existing.getId());
+        AppUser user = requireUser(updated.getUserId());
+        Product product = requireProduct(updated.getProductId());
+        return toResponse(updated, user, product);
+    }
+
+    @Override
+    public List<OrderResponse> getMyOrders() {
+        Long userId = SecurityUtils.currentUserId();
+        AppUser user = requireUser(userId);
+
+        return orderRepository.findAllByUserId(userId).stream()
+                .map(order -> {
+                    Product product = requireProduct(order.getProductId());
+                    return toResponse(order, user, product);
+                })
+                .toList();
     }
 }

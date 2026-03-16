@@ -13,4 +13,9 @@ public interface OrderService {
     OrderResponse update(Long id, OrderRequest request);
     void delete(Long id);
     OrderResponse updateStatus(Long id, OrderStatus status);
+
+    List<OrderResponse> getMyOrders();
+
+    OrderResponse updatePaymentInfo(Long id, String qr, String md5);
+    OrderResponse refreshPaymentStatus(Long id);
 }

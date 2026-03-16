@@ -5,16 +5,16 @@ import org.example.basiclogin.exception.BadRequestException;
 import org.example.basiclogin.exception.NotFoundException;
 import org.example.basiclogin.model.Entity.Product;
 import org.example.basiclogin.repository.ProductRepository;
-import org.example.basiclogin.repository.WaitlistRepository;
-import org.example.basiclogin.service.WaitlistService;
+import org.example.basiclogin.repository.WishlistRepository;
+import org.example.basiclogin.service.WishlistService;
 import org.example.basiclogin.utils.SecurityUtils;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class WaitlistServiceImpl implements WaitlistService {
+public class WishlistServiceImpl implements WishlistService {
 
-    private final WaitlistRepository waitlistRepository;
+    private final WishlistRepository wishlistRepository;
     private final ProductRepository productRepository;
 
     @Override
@@ -24,30 +24,30 @@ public class WaitlistServiceImpl implements WaitlistService {
         if (product == null) throw new NotFoundException("Product not found");
 
         Long userId = SecurityUtils.currentUserId();
-        boolean exists = waitlistRepository.exists(userId, productId) > 0;
+        boolean exists = wishlistRepository.exists(userId, productId) > 0;
         if (exists) {
-            waitlistRepository.leave(userId, productId);
+            wishlistRepository.remove(userId, productId);
             return false;
         }
-        waitlistRepository.join(userId, productId);
+        wishlistRepository.add(userId, productId);
         return true;
     }
 
     @Override
-    public boolean set(Long productId, boolean inWaitlist) {
+    public boolean set(Long productId, boolean inWishlist) {
         if (productId == null) throw new BadRequestException("Product id is required");
         Product product = productRepository.findById(productId);
         if (product == null) throw new NotFoundException("Product not found");
 
         Long userId = SecurityUtils.currentUserId();
-        boolean exists = waitlistRepository.exists(userId, productId) > 0;
+        boolean exists = wishlistRepository.exists(userId, productId) > 0;
 
-        if (inWaitlist) {
-            if (!exists) waitlistRepository.join(userId, productId);
+        if (inWishlist) {
+            if (!exists) wishlistRepository.add(userId, productId);
             return true;
         }
 
-        if (exists) waitlistRepository.leave(userId, productId);
+        if (exists) wishlistRepository.remove(userId, productId);
         return false;
     }
 }

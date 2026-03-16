@@ -37,46 +37,22 @@ public interface ProductRepository {
     Product findById(Long id);
 
     @Select("""
-            <script>
             SELECT p.id, p.name, p.description, p.price, p.image_url, p.size_options,
                    p.category, p.discount_percentage, p.created_by, p.on_promotion, p.created_at
             FROM products p
-            <if test='trending != null and trending == true'>
-              LEFT JOIN waitlists w ON w.product_id = p.id
-            </if>
-            WHERE 1=1
-            <if test='category != null and category != ""'>
-              AND p.category = #{category}
-            </if>
-            <if test='createdBy != null'>
-              AND p.created_by = #{createdBy}
-            </if>
-            <if test='name != null and name != ""'>
-              AND LOWER(p.name) LIKE CONCAT('%', LOWER(#{name}), '%')
-            </if>
-            <if test='newArrivals != null and newArrivals == true'>
-              AND p.created_at <![CDATA[>=]]> (CURRENT_TIMESTAMP - INTERVAL '7 days')
-            </if>
-            <if test='trending != null and trending == true'>
-              GROUP BY p.id
-              ORDER BY COUNT(w.id) DESC, p.id DESC
-            </if>
-            <if test='(trending == null or trending == false) and sortPrice != null and sortPrice == "asc"'>
-              ORDER BY p.price ASC
-            </if>
-            <if test='(trending == null or trending == false) and sortPrice != null and sortPrice == "desc"'>
-              ORDER BY p.price DESC
-            </if>
-            <if test='(trending == null or trending == false) and (sortPrice == null or sortPrice == "") and sortCreatedAt != null and sortCreatedAt == "asc"'>
-              ORDER BY p.created_at ASC
-            </if>
-            <if test='(trending == null or trending == false) and (sortPrice == null or sortPrice == "") and sortCreatedAt != null and sortCreatedAt == "desc"'>
-              ORDER BY p.created_at DESC
-            </if>
-            <if test='(trending == null or trending == false) and (sortPrice == null or sortPrice == "") and (sortCreatedAt == null or sortCreatedAt == "")'>
-              ORDER BY p.id
-            </if>
-            </script>
+            LEFT JOIN wishlists w ON w.product_id = p.id
+            WHERE (#{category} IS NULL OR #{category} = '' OR p.category = #{category})
+              AND (#{createdBy} IS NULL OR p.created_by = #{createdBy})
+              AND (#{name} IS NULL OR #{name} = '' OR LOWER(p.name) LIKE CONCAT('%', LOWER(#{name}), '%'))
+              AND (#{newArrivals} IS NULL OR #{newArrivals} = FALSE OR p.created_at >= (CURRENT_TIMESTAMP - INTERVAL '7 days'))
+            GROUP BY p.id
+            ORDER BY
+              CASE WHEN COALESCE(#{trending}, FALSE) THEN COUNT(w.id) END DESC,
+              CASE WHEN (COALESCE(#{trending}, FALSE) = FALSE AND #{sortPrice} = 'asc') THEN p.price END ASC,
+              CASE WHEN (COALESCE(#{trending}, FALSE) = FALSE AND #{sortPrice} = 'desc') THEN p.price END DESC,
+              CASE WHEN (COALESCE(#{trending}, FALSE) = FALSE AND (#{sortPrice} IS NULL OR #{sortPrice} = '') AND #{sortCreatedAt} = 'asc') THEN p.created_at END ASC,
+              CASE WHEN (COALESCE(#{trending}, FALSE) = FALSE AND (#{sortPrice} IS NULL OR #{sortPrice} = '') AND #{sortCreatedAt} = 'desc') THEN p.created_at END DESC,
+              p.id DESC
             """)
     @ResultMap("productMapper")
     List<Product> findAllFiltered(@Param("category") String category,
@@ -122,15 +98,13 @@ public interface ProductRepository {
     void delete(Long id);
 
     @Select("""
-            <script>
             SELECT p.id, p.name, p.description, p.price, p.image_url, p.size_options,
                    p.category, p.discount_percentage, p.created_by, p.on_promotion, p.created_at
             FROM products p
-            INNER JOIN waitlists w ON w.product_id = p.id
+            INNER JOIN wishlists w ON w.product_id = p.id
             WHERE w.user_id = #{userId}
             ORDER BY w.id DESC
-            </script>
             """)
     @ResultMap("productMapper")
-    List<Product> findWaitlistedProductsByUserId(@Param("userId") Long userId);
+    List<Product> findWishlistedProductsByUserId(@Param("userId") Long userId);
 }

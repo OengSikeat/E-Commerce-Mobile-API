@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.basiclogin.model.Enum.UserRole;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
@@ -20,11 +22,13 @@ public class AppUser implements UserDetails {
     private String fullName;
     private String email;
     private String password;
+    private UserRole role;
     private LocalDateTime createdAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        UserRole effectiveRole = role == null ? UserRole.USER : role;
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + effectiveRole.name()));
     }
 
     @Override

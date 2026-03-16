@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
@@ -21,10 +20,6 @@ public class OrderResponse {
     private Integer quantity;
     private BigDecimal totalAmount;
     private String status;
-    private String address;
-    private String city;
-    private String state;
-    private String country;
-    private String postcode;
-    private LocalDateTime createdAt;
+    private String qr;
+    private String md5;
 }

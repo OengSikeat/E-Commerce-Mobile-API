@@ -30,6 +30,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://e_commerce-db:5432/e_commerce_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: keat6951
+      BAKONG_BASE_URL: ${BAKONG_BASE_URL:-https://api-bakong.nbc.gov.kh}
+      BAKONG_EMAIL: ${BAKONG_EMAIL:-}
+      BAKONG_ACCOUNT_ID: ${BAKONG_ACCOUNT_ID:-}
     depends_on:
       e_commerce-db:
         condition: service_healthy

@@ -131,11 +131,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getWaitlistedProducts(Long userId) {
+    public List<ProductResponse> getWishlistedProducts(Long userId) {
         if (userId == null) {
-            throw new BadRequestException("User ID is required to fetch waitlisted products");
+            throw new BadRequestException("User ID is required to fetch wishlisted products");
         }
-        return productRepository.findWaitlistedProductsByUserId(userId)
+        return productRepository.findWishlistedProductsByUserId(userId)
                 .stream()
                 .map(this::toResponse)
                 .toList();

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthRequest {
-    @Schema(defaultValue = "string@gmail.com", example = "string@gmail.com")
+    @Schema(defaultValue = "admin@gmail.com", example = "admin@gmail.com")
     private String email;
     @Schema(defaultValue = "string", example = "string")
     private String password;

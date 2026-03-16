@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: "optional:file:./.env[.properties]"
   application:
     name: BasicLogin
   datasource:
@@ -20,3 +22,7 @@ server:
   tomcat:
     max-swallow-size: 50MB
     max-http-form-post-size: 50MB
+bakong:
+  base-url: ${BAKONG_BASE_URL:https://api-bakong.nbc.gov.kh}
+  email: ${BAKONG_EMAIL:}
+  account-id: ${BAKONG_ACCOUNT_ID:}

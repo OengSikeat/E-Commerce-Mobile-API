@@ -15,16 +15,13 @@ public interface OrderRepository {
             @Result(property = "quantity", column = "quantity"),
             @Result(property = "totalAmount", column = "total_amount"),
             @Result(property = "status", column = "status"),
-            @Result(property = "address", column = "address"),
-            @Result(property = "city", column = "city"),
-            @Result(property = "state", column = "state"),
-            @Result(property = "country", column = "country"),
-            @Result(property = "postcode", column = "postcode"),
+            @Result(property = "qr", column = "qr"),
+            @Result(property = "md5", column = "md5"),
             @Result(property = "createdAt", column = "created_at")
     })
     @Select("""
             SELECT id, user_id, product_id, quantity, total_amount, status,
-                   address, city, state, country, postcode, created_at
+                   qr, md5, created_at
             FROM orders
             WHERE id = #{id}
             """)
@@ -32,7 +29,7 @@ public interface OrderRepository {
 
     @Select("""
             SELECT id, user_id, product_id, quantity, total_amount, status,
-                   address, city, state, country, postcode, created_at
+                   qr, md5, created_at
             FROM orders
             ORDER BY id
             """)
@@ -40,10 +37,10 @@ public interface OrderRepository {
     List<Order> findAll();
 
     @Select("""
-            INSERT INTO orders (user_id, product_id, quantity, total_amount, status, address, city, state, country, postcode)
-            VALUES (#{userId}, #{productId}, #{quantity}, #{totalAmount}, #{status}, #{address}, #{city}, #{state}, #{country}, #{postcode})
+            INSERT INTO orders (user_id, product_id, quantity, total_amount, status, qr, md5)
+            VALUES (#{userId}, #{productId}, #{quantity}, #{totalAmount}, #{status}, #{qr}, #{md5})
             RETURNING id, user_id, product_id, quantity, total_amount, status,
-                      address, city, state, country, postcode, created_at
+                      qr, md5, created_at
             """)
     @ResultMap("orderMapper")
     Order create(@Param("userId") Long userId,
@@ -51,11 +48,8 @@ public interface OrderRepository {
                  @Param("quantity") Integer quantity,
                  @Param("totalAmount") java.math.BigDecimal totalAmount,
                  @Param("status") String status,
-                 @Param("address") String address,
-                 @Param("city") String city,
-                 @Param("state") String state,
-                 @Param("country") String country,
-                 @Param("postcode") String postcode);
+                 @Param("qr") String qr,
+                 @Param("md5") String md5);
 
     @Update("""
             UPDATE orders
@@ -64,14 +58,11 @@ public interface OrderRepository {
                 quantity = #{quantity},
                 total_amount = #{totalAmount},
                 status = #{status},
-                address = #{address},
-                city = #{city},
-                state = #{state},
-                country = #{country},
-                postcode = #{postcode}
+                qr = #{qr},
+                md5 = #{md5}
             WHERE id = #{id}
             RETURNING id, user_id, product_id, quantity, total_amount, status,
-                      address, city, state, country, postcode, created_at
+                      qr, md5, created_at
             """)
     @ResultMap("orderMapper")
     Order update(@Param("id") Long id,
@@ -80,11 +71,8 @@ public interface OrderRepository {
                  @Param("quantity") Integer quantity,
                  @Param("totalAmount") java.math.BigDecimal totalAmount,
                  @Param("status") String status,
-                 @Param("address") String address,
-                 @Param("city") String city,
-                 @Param("state") String state,
-                 @Param("country") String country,
-                 @Param("postcode") String postcode);
+                 @Param("qr") String qr,
+                 @Param("md5") String md5);
 
     @Delete("""
             DELETE FROM orders WHERE id = #{id}
@@ -93,8 +81,28 @@ public interface OrderRepository {
 
     @Update("""
             UPDATE orders
+            SET qr = #{qr},
+                md5 = #{md5}
+            WHERE id = #{id}
+            """)
+    int updatePaymentInfo(@Param("id") Long id,
+                          @Param("qr") String qr,
+                          @Param("md5") String md5);
+
+    @Update("""
+            UPDATE orders
             SET status = #{status}
             WHERE id = #{id}
             """)
     int updateStatus(@Param("id") Long id, @Param("status") String status);
+
+    @Select("""
+            SELECT id, user_id, product_id, quantity, total_amount, status,
+                   qr, md5, created_at
+            FROM orders
+            WHERE user_id = #{userId}
+            ORDER BY id DESC
+            """)
+    @ResultMap("orderMapper")
+    List<Order> findAllByUserId(@Param("userId") Long userId);
 }

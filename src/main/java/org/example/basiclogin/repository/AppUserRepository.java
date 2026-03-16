@@ -14,10 +14,11 @@ public interface AppUserRepository {
             @Result(property = "email", column = "email"),
             @Result(property = "fullName", column = "full_name"),
             @Result(property = "password", column = "password"),
+            @Result(property = "role", column = "role"),
             @Result(property = "createdAt", column = "created_at")
     })
     @Select("""
-                SELECT id, email, full_name, password, created_at FROM users
+                SELECT id, email, full_name, password, role, created_at FROM users
                 WHERE id = #{id}
             """)
     AppUser getUserByIdLite(Long id);
@@ -27,31 +28,32 @@ public interface AppUserRepository {
             @Result(property = "email", column = "email"),
             @Result(property = "fullName", column = "full_name"),
             @Result(property = "password", column = "password"),
+            @Result(property = "role", column = "role"),
             @Result(property = "createdAt", column = "created_at")
     })
     @Select("""
-                SELECT id, email, full_name, password, created_at FROM users
+                SELECT id, email, full_name, password, role, created_at FROM users
                 WHERE email = #{email}
             """)
     AppUser getUserByEmail(String email);
 
     @Select("""
-                INSERT INTO users (email, full_name, password)
-                VALUES (#{request.email}, #{request.fullName}, #{request.password})
-                RETURNING id, email, full_name, password, created_at
+                INSERT INTO users (email, full_name, password, role)
+                VALUES (#{request.email}, #{request.fullName}, #{request.password}, 'USER')
+                RETURNING id, email, full_name, password, role, created_at
             """)
     @ResultMap("appUserMapper")
     AppUser register(@Param("request") AppUserRequest request);
 
     @Select("""
-                SELECT id, email, full_name, password, created_at FROM users
+                SELECT id, email, full_name, password, role, created_at FROM users
                 WHERE id = #{id}
             """)
     @ResultMap("appUserMapper")
     AppUser getUserById(Long id);
 
     @Select("""
-                SELECT id, email, full_name, password, created_at FROM users
+                SELECT id, email, full_name, password, role, created_at FROM users
                 ORDER BY id
                 LIMIT #{size} OFFSET #{offset}
             """)
@@ -64,7 +66,7 @@ public interface AppUserRepository {
     long countAll();
 
     @Select("""
-                SELECT id, email, full_name, password, created_at FROM users
+                SELECT id, email, full_name, password, role, created_at FROM users
                 WHERE 1=0 /* findAllByCreatorId not supported - creators removed */
                 ORDER BY id
                 LIMIT #{size} OFFSET #{offset}
@@ -92,7 +94,7 @@ public interface AppUserRepository {
     @Update("""
                 UPDATE users SET email = #{request.email}, full_name = #{request.fullName}
                 WHERE id = #{id}
-                RETURNING id, email, full_name, password, created_at
+                RETURNING id, email, full_name, password, role, created_at
             """)
     @ResultMap("appUserMapper")
     AppUser update(@Param("id") Long id, @Param("request") AppUserRequest request);

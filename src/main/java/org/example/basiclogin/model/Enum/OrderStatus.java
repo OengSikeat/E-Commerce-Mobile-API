@@ -2,11 +2,9 @@ package org.example.basiclogin.model.Enum;
 
 public enum OrderStatus {
     PENDING,
-    SHIPPED,
-    DELIVERED;
+    PAID;
 
     public String dbValue() {
         return name().toLowerCase();
     }
 }
-

@@ -9,15 +9,10 @@ import org.example.basiclogin.model.Request.AppUserRequest;
 import org.example.basiclogin.model.Response.AppUserResponse;
 import org.example.basiclogin.repository.AppUserRepository;
 import org.example.basiclogin.service.AppUserService;
-import org.example.basiclogin.utils.PaginatedResponse;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -50,6 +45,7 @@ public class AppUserServiceImpl implements AppUserService {
                 .id(updatedUser.getId())
                 .fullName(updatedUser.getFullName())
                 .email(updatedUser.getEmail())
+                .role(updatedUser.getRole() == null ? null : updatedUser.getRole().name())
                 .createdAt(updatedUser.getCreatedAt())
                 .build();
     }

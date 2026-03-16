@@ -23,7 +23,7 @@ public interface ProductService {
 
     ProductResponse updateDiscount(Long id, org.example.basiclogin.model.Request.DiscountRequest request);
 
-    List<ProductResponse> getWaitlistedProducts(Long userId);
+    List<ProductResponse> getWishlistedProducts(Long userId);
 
     void delete(Long id);
 }
