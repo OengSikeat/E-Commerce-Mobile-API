@@ -5,6 +5,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/e_commerce_db
     username: postgres
     password: keat6951
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+      file-size-threshold: 2MB
 minio:
   url: http://localhost:9000
   access-key: admin
@@ -12,3 +17,6 @@ minio:
   bucket-name: e-commerce-bucket
 server:
   port: 9090
+  tomcat:
+    max-swallow-size: 50MB
+    max-http-form-post-size: 50MB

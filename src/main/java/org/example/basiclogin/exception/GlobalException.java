@@ -11,6 +11,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -97,6 +99,22 @@ public class GlobalException{
                 .status(HttpStatus.FORBIDDEN)
                 .build();
         return new ResponseEntity<>(apiResponse, apiResponse.getStatus());
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ProblemDetail handleMaxUploadSizeExceeded(MaxUploadSizeExceededException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(413);
+        problemDetail.setDetail("Maximum upload size exceeded");
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ProblemDetail handleMultipartException(MultipartException e) {
+        // Commonly happens in production behind proxies when the multipart request is malformed/truncated.
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Invalid multipart request");
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        return problemDetail;
     }
 
     @ExceptionHandler(Exception.class)
