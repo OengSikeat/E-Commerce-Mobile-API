@@ -102,11 +102,9 @@ public interface ProductRepository {
                     "description = #{request.description}, " +
                     "price = #{request.price}, " +
                     "image_url = #{request.imageUrl} " +
-                    "WHERE id = #{id} " +
-                    "RETURNING id, name, description, price, image_url, category, discount_percentage, created_by, on_promotion, created_at"
+                    "WHERE id = #{id}"
     )
-    @ResultMap("productMapper")
-    Product update(@Param("id") Long id, @Param("request") ProductRequest request);
+    int update(@Param("id") Long id, @Param("request") ProductRequest request);
 
     @Update("""
             UPDATE products

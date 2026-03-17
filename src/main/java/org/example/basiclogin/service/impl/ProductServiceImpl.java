@@ -58,12 +58,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse update(Long id, ProductRequest request) {
-        // ensure exists (also gives better 404 than silent null)
+        if (id == null) throw new BadRequestException("Product id is required");
+        if (request == null) throw new BadRequestException("Request body is required");
+
         Product existing = productRepository.findById(id);
         if (existing == null) throw new NotFoundException("Product not found");
 
-        // category is not updated here (it comes from the enum param on create only)
-        Product updated = productRepository.update(id, request);
+        int updatedRows = productRepository.update(id, request);
+        if (updatedRows == 0) throw new NotFoundException("Product not found");
+
+        Product updated = productRepository.findById(id);
+        if (updated == null) throw new NotFoundException("Product not found");
         return toResponse(updated);
     }
 
