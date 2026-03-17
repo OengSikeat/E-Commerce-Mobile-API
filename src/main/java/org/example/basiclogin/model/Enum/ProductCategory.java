@@ -5,35 +5,38 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public enum ProductCategory {
-    // Women
-    WOMEN_TOPS,
-    WOMEN_DRESSES,
-    WOMEN_BOTTOMS,
-    WOMEN_OUTERWEAR,
-    WOMEN_ACTIVEWEAR,
-    WOMEN_INTIMATES,
-
-    // Men
-    MEN_TOPS,
-    MEN_BOTTOMS,
-    MEN_OUTERWEAR,
-    MEN_ACTIVEWEAR,
-    MEN_UNDERWEAR,
-
-    // Kids
-    KIDS_GIRLS,
-    KIDS_BOYS,
-    KIDS_BABY,
-
-    // Footwear
-    SHOES_SNEAKERS,
-    SHOES_SANDALS,
-    SHOES_BOOTS,
-
-    // Accessories
+    // Fashion
+    WOMENS_FASHION,
+    MENS_FASHION,
+    KIDS_FASHION,
+    SHOES,
     BAGS,
+    JEWELRY,
+    WATCHES,
+
+    // Electronics
+    SMARTPHONES,
+    LAPTOPS,
+    TABLETS,
+    CAMERAS,
+    AUDIO,
+    GAMING,
     ACCESSORIES,
 
+    // Home & Living
+    HOME_APPLIANCES,
+    HOME_DECOR,
+    FURNITURE,
+    KITCHEN_DINING,
+
+    // Beauty & Health
+    BEAUTY,
+    PERSONAL_CARE,
+
+    // Sports & Outdoors
+    SPORTS_OUTDOORS,
+
+    // Default / fallback
     OTHERS;
 
     public static final Set<String> ALLOWED = Arrays.stream(values())

@@ -14,7 +14,6 @@ CREATE TABLE products (
                           description TEXT,
                           price DECIMAL(10,2) NOT NULL,
                           image_url VARCHAR(500),
-                          size_options VARCHAR(255),
                           category VARCHAR(100) DEFAULT 'OTHERS',
                           discount_percentage DECIMAL(5,2) DEFAULT 0,
                           created_by INTEGER,

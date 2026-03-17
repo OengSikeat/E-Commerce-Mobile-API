@@ -20,10 +20,8 @@ public class ProductResponse {
     private String description;
     private BigDecimal price;
     private String imageUrl;
-    private String sizeOptions;
     private String category;
     private BigDecimal discountPercentage;
-    private Long createdBy;
     private Boolean onPromotion;
     private LocalDateTime createdAt;
 }

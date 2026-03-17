@@ -30,10 +30,8 @@ public class ProductServiceImpl implements ProductService {
                 .description(p.getDescription())
                 .price(p.getPrice())
                 .imageUrl(p.getImageUrl())
-                .sizeOptions(p.getSizeOptions())
                 .category(p.getCategory())
                 .discountPercentage(p.getDiscountPercentage())
-                .createdBy(p.getCreatedBy())
                 .onPromotion(p.getOnPromotion())
                 .createdAt(p.getCreatedAt())
                 .build();

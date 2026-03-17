@@ -25,7 +25,5 @@ public class ProductRequest {
 
     private String imageUrl;
 
-    private String sizeOptions;
-
     // keep for update (optional), but not required for create (controller sets it)
 }

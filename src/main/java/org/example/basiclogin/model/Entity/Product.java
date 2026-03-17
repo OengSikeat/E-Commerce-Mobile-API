@@ -18,7 +18,6 @@ public class Product {
     private String description;
     private BigDecimal price;
     private String imageUrl;
-    private String sizeOptions;
     private String category;
     private BigDecimal discountPercentage;
     private Long createdBy;

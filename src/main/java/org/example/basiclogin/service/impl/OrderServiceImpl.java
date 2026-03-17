@@ -1,8 +1,12 @@
 package org.example.basiclogin.service.impl;
 
+import io.github.tongbora.bakong.dto.BakongRequest;
 import io.github.tongbora.bakong.dto.BakongResponse;
 import io.github.tongbora.bakong.dto.CheckTransactionRequest;
 import io.github.tongbora.bakong.service.BakongService;
+import kh.gov.nbc.bakong_khqr.model.KHQRData;
+import kh.gov.nbc.bakong_khqr.model.KHQRResponse;
+import kh.gov.nbc.bakong_khqr.model.KHQRCurrency;
 import lombok.RequiredArgsConstructor;
 import org.example.basiclogin.exception.BadRequestException;
 import org.example.basiclogin.exception.NotFoundException;
@@ -51,8 +55,10 @@ public class OrderServiceImpl implements OrderService {
                 .description(p.getDescription())
                 .price(p.getPrice())
                 .imageUrl(p.getImageUrl())
-                .sizeOptions(p.getSizeOptions())
+                .category(p.getCategory())
+                .discountPercentage(p.getDiscountPercentage())
                 .onPromotion(p.getOnPromotion())
+                .createdAt(p.getCreatedAt())
                 .build();
     }
 
@@ -145,6 +151,28 @@ public class OrderServiceImpl implements OrderService {
         return asText.toLowerCase().contains("success");
     }
 
+    private static String safeKhqr(KHQRResponse<KHQRData> response) {
+        try {
+            if (response == null) return null;
+            KHQRData data = response.getData();
+            if (data == null) return null;
+            return data.getQr();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static String safeMd5(KHQRResponse<KHQRData> response) {
+        try {
+            if (response == null) return null;
+            KHQRData data = response.getData();
+            if (data == null) return null;
+            return data.getMd5();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @Override
     public OrderResponse create(OrderRequest request) {
         if (request == null) {
@@ -156,14 +184,56 @@ public class OrderServiceImpl implements OrderService {
         int qty = requireQuantity(request.getQuantity());
         BigDecimal totalAmount = calculateTotal(product, qty);
 
+        // Generate Bakong KHQR and persist it into the order.
+        // As requested: currency USD, amount uses the computed totalAmount
+        final String qr;
+        final String md5;
+        try {
+            double amount = totalAmount.doubleValue();
+            if (amount <= 0) {
+                throw new BadRequestException("Order amount must be greater than 0");
+            }
+
+            BakongRequest bakongRequest = new BakongRequest(
+                    KHQRCurrency.USD,
+                    amount,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            KHQRResponse<KHQRData> khqrResponse = bakongService.generateQR(bakongRequest);
+            qr = safeKhqr(khqrResponse);
+            md5 = safeMd5(khqrResponse);
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BadRequestException("Failed to generate Bakong QR");
+        }
+
+        if (qr == null || qr.isBlank() || md5 == null || md5.isBlank()) {
+            throw new BadRequestException("Failed to generate Bakong QR");
+        }
+
         Order created = orderRepository.create(
                 currentUser.getId(),
                 product.getId(),
                 qty,
                 totalAmount,
                 OrderStatus.PENDING.dbValue(),
-                null,
-                null
+                qr,
+                md5
         );
 
         return toResponse(created, currentUser, product);
