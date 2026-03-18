@@ -54,6 +54,9 @@ public interface ProductRepository {
               <if test="newArrivals != null and newArrivals == true">
                 AND p.created_at &gt;= (CURRENT_TIMESTAMP - INTERVAL '7 days')
               </if>
+              <if test="onPromotion != null and onPromotion == true">
+                AND p.on_promotion = TRUE
+              </if>
             </where>
             GROUP BY p.id
             ORDER BY
@@ -84,7 +87,8 @@ public interface ProductRepository {
                                   @Param("sortCreatedAt") String sortCreatedAt,
                                   @Param("createdBy") Long createdBy,
                                   @Param("trending") Boolean trending,
-                                  @Param("name") String name);
+                                  @Param("name") String name,
+                                  @Param("onPromotion") Boolean onPromotion);
 
     @Select(
             "INSERT INTO products (name, description, price, image_url, category, discount_percentage, created_by, on_promotion) " +

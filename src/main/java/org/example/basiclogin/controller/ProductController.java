@@ -44,16 +44,15 @@ public class ProductController extends BaseResponse {
     public ResponseEntity<ApiResponse<List<ProductResponse>>> getAll(
             @RequestParam(required = false) ProductCategory category,
             @RequestParam(required = false) Boolean newArrivals,
-            @RequestParam(required = false) SortPrice sortPrice,
-            @RequestParam(required = false) SortCreatedAt sortCreatedAt,
+            @RequestParam(required = false) String sortPrice,
+            @RequestParam(required = false) String sortCreatedAt,
             @RequestParam(required = false) Boolean trending,
-            @RequestParam(required = false) String name
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Boolean onPromotion
     ) {
         String categoryValue = category == null ? null : category.name();
-        String sortPriceDir = sortPrice == null ? null : sortPrice.toDirection().name().toLowerCase();
-        String sortCreatedAtDir = sortCreatedAt == null ? null : sortCreatedAt.toDirection().name().toLowerCase();
         return responseEntity(true, "Products fetched", HttpStatus.OK,
-                productService.getAll(categoryValue, newArrivals, sortPriceDir, sortCreatedAtDir, null, trending, name));
+                productService.getAll(categoryValue, newArrivals, sortPrice, sortCreatedAt, null, trending, name, onPromotion));
     }
 
     @GetMapping("/{id}")

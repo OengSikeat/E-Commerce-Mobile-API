@@ -34,10 +34,10 @@ public enum ProductCategory {
     PERSONAL_CARE,
 
     // Sports & Outdoors
-    SPORTS_OUTDOORS,
+    SPORTS_OUTDOORS;
 
     // Default / fallback
-    OTHERS;
+
 
     public static final Set<String> ALLOWED = Arrays.stream(values())
             .map(Enum::name)

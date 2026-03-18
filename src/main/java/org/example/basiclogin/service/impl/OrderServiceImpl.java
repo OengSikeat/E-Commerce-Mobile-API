@@ -26,6 +26,7 @@ import org.example.basiclogin.utils.SecurityUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Service
@@ -80,7 +81,18 @@ public class OrderServiceImpl implements OrderService {
         if (product.getPrice() == null) {
             throw new BadRequestException("Product price is missing");
         }
-        return product.getPrice().multiply(BigDecimal.valueOf(quantity));
+        
+        BigDecimal unitPrice = product.getPrice();
+        
+        // Apply promotional discount if enabled
+        if (Boolean.TRUE.equals(product.getOnPromotion()) && product.getDiscountPercentage() != null) {
+            BigDecimal discountFactor = BigDecimal.valueOf(1.0).subtract(
+                    product.getDiscountPercentage().divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP)
+            );
+            unitPrice = unitPrice.multiply(discountFactor);
+        }
+        
+        return unitPrice.multiply(BigDecimal.valueOf(quantity)).setScale(2, RoundingMode.HALF_UP);
     }
 
     private AppUser requireUser(Long userId) {

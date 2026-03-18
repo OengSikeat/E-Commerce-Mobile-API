@@ -86,7 +86,8 @@ public class ProductServiceImpl implements ProductService {
                                        String sortCreatedAt,
                                        Long createdBy,
                                        Boolean trending,
-                                       String name) {
+                                       String name,
+                                       Boolean onPromotion) {
         if (sortPrice != null && !sortPrice.isBlank()) {
             String normalized = sortPrice.trim().toLowerCase();
             if (!normalized.equals("asc") && !normalized.equals("desc")) {
@@ -108,7 +109,7 @@ public class ProductServiceImpl implements ProductService {
             normalizedCategory = CategoryUtils.normalizeOrThrow(category);
         }
 
-        return productRepository.findAllFiltered(normalizedCategory, newArrivals, sortPrice, sortCreatedAt, createdBy, trending, name)
+        return productRepository.findAllFiltered(normalizedCategory, newArrivals, sortPrice, sortCreatedAt, createdBy, trending, name, onPromotion)
                 .stream()
                 .map(this::toResponse)
                 .toList();

@@ -15,7 +15,8 @@ public interface ProductService {
                                 String sortCreatedAt,
                                 Long createdBy,
                                 Boolean trending,
-                                String name);
+                                String name,
+                                Boolean onPromotion);
 
     ProductResponse getById(Long id);
 
